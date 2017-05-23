@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><title>Untitled</title><meta charset='utf-8'><link href='https://dn-maxiang.qbox.me/res-min/themes/marxico.css' rel='stylesheet'><style></style></head><body><div id='preview-contents' class='note-content'>
+                        
+                    
+
+<p>易路开放平台SSO单点登录</p>
+
+<blockquote>
+  <p>接口：<code>api/oauth2/oauth2_token</code></p>
+</blockquote>
+
+<p>功能：获取token和linkid</p>
+
+<p>参数：<code>appid</code></p>
+
+<p>将参数填入headers中identification字段，并且对参数进行base64编码</p>
+
+<pre class="prettyprint hljs-dark"><code class="hljs javascript"><span class="hljs-keyword">const</span> $ = <span class="hljs-built_in">require</span>(<span class="hljs-string">'jquery'</span>);<br><span class="hljs-keyword">const</span> base64 = <span class="hljs-built_in">require</span>(<span class="hljs-string">'base64-url'</span>);<br><br><span class="hljs-comment">// 原始参数</span><br><span class="hljs-keyword">let</span> appid = <span class="hljs-built_in">JSON</span>.stringify({<span class="hljs-string">"appid"</span> : <span class="hljs-string">"5628278295749946"</span>});<br><br><span class="hljs-comment">// base64编码</span><br><span class="hljs-keyword">let</span> base64Appid = base64.encode(appid);<br><br><span class="hljs-comment">// 写入headers并发起请求</span><br>$.ajax({<br>    <span class="hljs-attr">url</span>: <span class="hljs-string">'/api/oauth2/oauth2_token'</span>,<br>    <span class="hljs-attr">type</span>: <span class="hljs-string">'POST'</span>,<br>    <span class="hljs-attr">dataType</span>: <span class="hljs-string">'json'</span>,<br>    <span class="hljs-attr">headers</span>: {<br>        <span class="hljs-string">'identification'</span>: base64Appid<br>    },<br>    <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">data</span>) </span>{<br>        <span class="hljs-built_in">console</span>.log(data)<br>    },<br>    <span class="hljs-attr">error</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">data</span>) </span>{<br>        <span class="hljs-built_in">console</span>.log(data)<br>    }<br>});<br></code></pre>
+
+<p>返回值：</p>
+
+<pre class="prettyprint hljs-dark"><code class="hljs json">{<br>  <span class="hljs-attr">"code"</span>: <span class="hljs-number">0</span>,<br>  <span class="hljs-attr">"msg"</span>: <span class="hljs-string">"OK"</span>,<br>  <span class="hljs-attr">"data"</span>: {<br>    <span class="hljs-attr">"token"</span>: <span class="hljs-string">"95c97508fbbc4c1388d4812f32b4541e"</span>,<br>    <span class="hljs-attr">"linkid"</span>: <span class="hljs-string">"673fe871-defb-416e-a995-bf29644ecc97"</span><br>  }<br>}<br></code></pre>
+
+<blockquote>
+  <p>加密数据</p>
+</blockquote>
+
+<p><strong>加解密模块</strong>  <a href="https://www.npmjs.com/package/eroad-oauth2-encryption" target="_blank">eroad-oauth2-encryption</a></p>
+
+<pre class="prettyprint hljs-dark"><code class="hljs lasso">const cipher = <span class="hljs-keyword">require</span>(<span class="hljs-string">'eroad-oauth2-encryption'</span>);<br><br><span class="hljs-comment">// 要发送的数据</span><br><span class="hljs-keyword">let</span> <span class="hljs-built_in">data</span> = {<br>    <span class="hljs-string">"code"</span>: <span class="hljs-number">0</span>,<br>    <span class="hljs-string">"msg"</span>: <span class="hljs-string">"OK"</span>,<br>    <span class="hljs-string">"data"</span>: {<br>        <span class="hljs-string">"name"</span>: <span class="hljs-string">"测试数据"</span><br>    }<br>};<br><span class="hljs-comment">// api/oauth2/oauth2_token接口返回值中的token</span><br><span class="hljs-keyword">let</span> token = <span class="hljs-string">'95c97508fbbc4c1388d4812f32b4541e'</span>; <br><span class="hljs-keyword">let</span> appid = <span class="hljs-string">'5628278295749946'</span>;<br><br><span class="hljs-comment">// 对数据进行加密</span><br><span class="hljs-keyword">let</span> enData = cipher.encrypt(<span class="hljs-built_in">data</span>, token, appid);<br><br><span class="hljs-comment">// 要解密的数据</span><br><span class="hljs-keyword">let</span> rdata = {<br>    <span class="hljs-string">"summary"</span>: <span class="hljs-string">"c287350f8cebd36ca26b343d8f6bcaae"</span>,<br>    <span class="hljs-string">"data"</span>: <span class="hljs-string">"s+wrANjtWJf5vemG4zHufv+vKRzxOFI75fp6wEG7CfdNxvjzIA/L2iYpOLW9F/eYZJ/5T7SEoDwWGL+zdGugY2hVZpziTdc7hFlFzuWvlTafbgrb/JwZOX+Iw7i2IcIY"</span><br>},<br><span class="hljs-comment">// 对数据进行解密</span><br><span class="hljs-keyword">let</span> deData = cipher.decrypt(rdata, token, appid)<br></code></pre>
+
+<blockquote>
+  <p>接口：<code>api/oauth2/decrypt_test</code></p>
+</blockquote>
+
+<p>功能：加解密测试接口, 返回你传入的参数</p>
+
+<p>参数：</p>
+
+<ul><li>headers中的identification填入<code>api/oauth2/oauth2_token</code>接口返回的linkid</li>
+<li>body中放入已经加密过的数据</li>
+</ul>
+
+<pre class="prettyprint hljs-dark"><code class="hljs javascript"><span class="hljs-comment">// linkid</span><br><span class="hljs-keyword">let</span> linkid = <span class="hljs-built_in">JSON</span>.stringify({<span class="hljs-string">"linkid"</span> : <span class="hljs-string">"673fe871-defb-416e-a995-bf29644ecc97"</span>});<br><span class="hljs-keyword">let</span> base64Linkid = base64.encode(linkid);<br><br><span class="hljs-comment">// 要发送的数据</span><br><span class="hljs-keyword">let</span> data = {<br>    <span class="hljs-string">"code"</span>: <span class="hljs-number">0</span>,<br>    <span class="hljs-string">"msg"</span>: <span class="hljs-string">"OK"</span>,<br>    <span class="hljs-string">"data"</span>: {<br>        <span class="hljs-string">"name"</span>: <span class="hljs-string">"测试数据"</span><br>    }<br>};<br><span class="hljs-comment">// api/oauth2/oauth2_token接口返回值中的token</span><br><span class="hljs-keyword">let</span> token = <span class="hljs-string">'95c97508fbbc4c1388d4812f32b4541e'</span>; <br><span class="hljs-keyword">let</span> appid = <span class="hljs-string">'5628278295749946'</span>;<br><br><span class="hljs-comment">// 对数据进行加密</span><br><span class="hljs-keyword">let</span> enData = cipher.encrypt(data, token, appid);<br><br><span class="hljs-comment">// 传入加密后数据</span><br>$.ajax({<br>    <span class="hljs-attr">url</span>: <span class="hljs-string">'/api/oauth2/oauth2_token'</span>,<br>    <span class="hljs-attr">type</span>: <span class="hljs-string">'POST'</span>,<br>    <span class="hljs-attr">dataType</span>: <span class="hljs-string">'json'</span>,<br>    <span class="hljs-attr">data</span>: enData,<br>    <span class="hljs-attr">headers</span>: {<br>        <span class="hljs-string">'identification'</span>: base64Linkid<br>    },<br>    <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">res</span>) </span>{<br>        <span class="hljs-comment">// 返回的数据是加密后的，需要进行解密</span><br>        <span class="hljs-built_in">console</span>.log(res)<br>        <span class="hljs-keyword">let</span> deData = cipher.decrypt(res, token, appid)<br>        <span class="hljs-built_in">console</span>.log(deData)<br>    },<br>    <span class="hljs-attr">error</span>: <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">data</span>) </span>{<br>        <span class="hljs-built_in">console</span>.log(data)<br>    }<br>});<br></code></pre></div></body></html>
