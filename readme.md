@@ -1,6 +1,7 @@
 易路开放平台oauth 加解密说明
-作者：易路软件前端团队，sakura,sheely
-
+```
+作者：易路软件前端团队,sakura,sheely
+```
 > 接口：`api/oauth2/oauth2_token`
 
 
@@ -15,7 +16,7 @@ const $ = require('jquery');
 const base64 = require('base64-url');
 
 // 原始参数
-let appid = JSON.stringify({"appid" : "5628278295749946"});
+let appid = JSON.stringify({"appid" : "$appid"});
 
 // base64编码
 let base64Appid = base64.encode(appid);
@@ -42,8 +43,8 @@ $.ajax({
   "code": 0,
   "msg": "OK",
   "data": {
-    "token": "95c97508fbbc4c1388d4812f32b4541e",
-    "linkid": "673fe871-defb-416e-a995-bf29644ecc97"
+    "token": "token",
+    "linkid": "linkid"
   }
 }
 ```
@@ -64,8 +65,8 @@ let data = {
     }
 };
 // api/oauth2/oauth2_token接口返回值中的token
-let token = '95c97508fbbc4c1388d4812f32b4541e'; 
-let appid = '5628278295749946';
+let token = '$token'; 
+let appid = '$appid';
 
 // 对数据进行加密
 let enData = cipher.encrypt(data, token, appid);
@@ -102,8 +103,8 @@ let data = {
     }
 };
 // api/oauth2/oauth2_token接口返回值中的token
-let token = '95c97508fbbc4c1388d4812f32b4541e'; 
-let appid = '5628278295749946';
+let token = '$token'; 
+let appid = '$appid';
 
 // 对数据进行加密
 let enData = cipher.encrypt(data, token, appid);
