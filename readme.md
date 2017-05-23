@@ -1,4 +1,5 @@
-易路开放平台SSO单点登录
+易路开放平台oauth 加解密说明
+作者：易路软件前端团队，sakura,sheely
 
 > 接口：`api/oauth2/oauth2_token`
 
